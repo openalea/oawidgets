@@ -1,5 +1,5 @@
 ======================================================
-Welcome to openalea.deepberry's documentation!
+Welcome to oawidgets's documentation!
 ======================================================
 
 .. sidebar:: Summary

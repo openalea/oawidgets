@@ -81,6 +81,7 @@ def scene2mesh(scene, property=None, side='front'):
     colordict={}
     count=-1
     offset=0
+    opacity = 1.0
     curves, texts, meshes = [], [], []
     for obj in scene:
         if isinstance(obj.geometry, Text):
@@ -97,6 +98,7 @@ def scene2mesh(scene, property=None, side='front'):
         vertices.extend(pts)
         color = obj.appearance.ambient
         color = (color.red, color.green, color.blue)
+        opacity = 1 - obj.appearance.transparency
         if color not in colordict:
             count += 1
             colordict[color] = count
@@ -106,10 +108,13 @@ def scene2mesh(scene, property=None, side='front'):
     colors=np.array(list(colordict.keys()))/255.
     if property is not None:
         property = np.repeat(np.array(property), [3]*len(property))
-        mesh = k3d.mesh(vertices=vertices, indices=indices, attribute=property, color_map=k3d.basic_color_maps.Jet, color_range=[min(property), max(property)], side=side)
+        mesh = k3d.mesh(vertices=vertices, indices=indices, attribute=property,
+                        color_map=k3d.basic_color_maps.Jet,
+                        color_range=[min(property), max(property)],
+                        side=side, opacity=opacity)
     elif len(colors) == 1:
         colorhex = int(matplotlib.colors.rgb2hex(colors[0])[1:], 16)
-        mesh = k3d.mesh(vertices=vertices, indices=indices, side=side)
+        mesh = k3d.mesh(vertices=vertices, indices=indices, side=side, opacity=opacity)
         mesh.color=colorhex
     else:
         color_map = list(zip(list(np.array(list(colordict.values())) /
@@ -124,7 +129,8 @@ def scene2mesh(scene, property=None, side='front'):
                         indices=indices,
                         attribute=attribute,
                         color_map=color_map,
-                        side=side)
+                        side=side,
+                        opacity=opacity)
 
     meshes = [mesh]
     if curves:

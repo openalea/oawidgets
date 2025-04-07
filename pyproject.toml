@@ -41,6 +41,7 @@ doc = [
   "myst-parser",
   "sphinx-favicon",
   "ipykernel",
+  "sphinx-copybutton",
   "ipython_genutils",
   "nbsphinx",
 ]

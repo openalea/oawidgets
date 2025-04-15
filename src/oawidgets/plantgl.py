@@ -84,6 +84,7 @@ def scene2mesh(scene, property=None, side='front'):
     opacity = 1.0
     curves, texts, meshes = [], [], []
     for obj in scene:
+        opacity = 1.0
         if isinstance(obj.geometry, Text):
             pos = obj.geometry.position
             texts.append(k3d.text(obj.geometry.string, [pos.x, pos.y, pos.z], label_box=False, color=0xaaaaaa))
@@ -117,20 +118,26 @@ def scene2mesh(scene, property=None, side='front'):
         mesh = k3d.mesh(vertices=vertices, indices=indices, side=side, opacity=opacity)
         mesh.color=colorhex
     else:
-        color_map = list(zip(list(np.array(list(colordict.values())) /
-                             float(max(colordict.values()))),
-                        colors[:,0],
-                        colors[:,1],
-                        colors[:,2]))
-        color_map.sort()
-        #color_map=k3d.basic_color_maps.Jet
-        attribute = list(np.array(attribute)/float(max(attribute)))
-        mesh = k3d.mesh(vertices=vertices,
-                        indices=indices,
-                        attribute=attribute,
-                        color_map=color_map,
-                        side=side,
-                        opacity=opacity)
+        try:
+            color_map = list(zip(list(np.array(list(colordict.values())) /
+                                 float(max(colordict.values()))),
+                            colors[:,0],
+                            colors[:,1],
+                            colors[:,2]))
+            color_map.sort()
+            attribute = list(np.array(attribute)/float(max(attribute)))
+            mesh = k3d.mesh(vertices=vertices,
+                            indices=indices,
+                            attribute=attribute,
+                            color_map=color_map,
+                            side=side,
+                            opacity=opacity)
+        except ValueError:
+            mesh = k3d.mesh(vertices=vertices,
+                            indices=indices,
+                            attribute=attribute,
+                            side=side,
+                            opacity=opacity)
 
     meshes = [mesh]
     if curves:
@@ -147,8 +154,13 @@ def group_meshes_by_color(scene, side='front'):
     """
 
     group_color = {}
+    texts = []
 
     for obj in scene:
+        if isinstance(obj.geometry, Text):
+            pos = obj.geometry.position
+            texts.append(k3d.text(obj.geometry.string, [pos.x, pos.y, pos.z], label_box=False, color=0xaaaaaa))
+            continue
         color = obj.appearance.ambient
         color = (color.red, color.green, color.blue)
 
@@ -168,6 +180,9 @@ def group_meshes_by_color(scene, side='front'):
     if curves:
         meshes_crv = [curve2mesh([obj]) for obj in list(curves.values())[0]]
         meshes_scene.extend(meshes_crv)
+
+    if texts:
+        meshes_scene.extend(texts)
     return meshes_scene
 
 

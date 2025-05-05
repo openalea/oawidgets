@@ -22,6 +22,6 @@ mamba install -c openalea3 -c conda-forge oawidgets openalea.lpy
 
 ## Contributors
 
-<a href="https://github.com/openalea/agroservices/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=H2020-IPM-openalea/agroservices" />
+<a href="https://github.com/openalea/oawidgets/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=openalea/oawidgets" />
 </a>

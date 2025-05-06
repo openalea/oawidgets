@@ -39,32 +39,20 @@ Usage
 from __future__ import absolute_import
 from __future__ import print_function
 
-import tempfile, os
-from glob import glob
-from shutil import rmtree
-
-import numpy as np
 import openalea.lpy as lpy
-from openalea.plantgl.all import Viewer
-
+from IPython.core.displaypub import publish_display_data
+from IPython.core.magic import (Magics, magics_class, line_magic,
+                                line_cell_magic, needs_local_scope)
+from IPython.core.magic_arguments import (
+    argument, magic_arguments, parse_argstring
+)
+from IPython.display import display
+from IPython.testing.skipdoctest import skip_doctest
+from IPython.utils.py3compat import unicode_to_str
 from openalea.mtg import MTG
 from openalea.mtg.io import mtg2lpy, lpy2mtg
 
 from oawidgets import plantgl
-
-from xml.dom import minidom
-
-
-from IPython.core.displaypub import publish_display_data
-from IPython.core.magic import (Magics, magics_class, line_magic,
-                                line_cell_magic, needs_local_scope)
-from IPython.testing.skipdoctest import skip_doctest
-from IPython.core.magic_arguments import (
-    argument, magic_arguments, parse_argstring
-)
-from IPython.utils.py3compat import unicode_to_str
-from IPython.display import Image, display
-
 
 _mimetypes = {'png' : 'image/png',
              'svg' : 'image/svg+xml',
@@ -111,8 +99,8 @@ class LpyMagics(Magics):
     @skip_doctest
     @line_magic
     def lpy_axiom(self, line):
-        '''
-        Line-level magic that define the Lsystm Axiom to Lpy.
+        """
+        Line-level magic that define the Lsystem Axiom to Lpy.
 
         `line` should be made up of a string or an AxialTree available in the
         IPython namespace::
@@ -124,7 +112,7 @@ class LpyMagics(Magics):
             In [11]: %%lpy -n 10
             Out[11]: 2.0
 
-        '''
+        """
         axiom = line
         axiom = unicode_to_str(axiom)
         self._lsys.axiom = axiom
@@ -133,7 +121,7 @@ class LpyMagics(Magics):
     @skip_doctest
     @line_magic
     def lpy_rule(self, line):
-        '''
+        """
         TODO : Update the doc string
         Line-level magic that pulls a variable from Lpy.
 
@@ -141,7 +129,7 @@ class LpyMagics(Magics):
             In [2]: %lpy_rule 'A --> F A'
             In [3]: %%lpy -n 10
 
-        '''
+        """
         rule = unicode_to_str(line)
         self._lsys.addRule(rule)
 
@@ -192,7 +180,7 @@ class LpyMagics(Magics):
         )
     @line_cell_magic
     def lpy(self, line, cell=None, local_ns=None):
-        '''
+        """
         .. todo:: Update the docstring
 
         Execute code in Lpy, and pull some of the results back into the
@@ -235,7 +223,7 @@ class LpyMagics(Magics):
             In [18]: %%lpy -s 600,800 -f svg
                 ...: plot([1, 2, 3]);
 
-        '''
+        """
         args = parse_argstring(self.lpy, line)
 
         # arguments 'code' in line are prepended to the cell lines
@@ -353,24 +341,24 @@ class LpyMagics(Magics):
         # Publish images
         image = self._plot3d(scene, format=plot_format)
         if image is not None:
-        	plot_mime_type = _mimetypes.get(plot_format, 'image/png')
-        	#width, height = [int(s) for s in size.split(',')]
-        	#for image in images:
-        	display_data[plot_mime_type]= image
+            plot_mime_type = _mimetypes.get(plot_format, 'image/png')
+            #width, height = [int(s) for s in size.split(',')]
+            #for image in images:
+            display_data[plot_mime_type]= image
 
-	        """
-	        if args.output:
-	            for output in ','.join(args.output).split(','):
-	                output = unicode_to_str(output)
-	                self.shell.push({output: self._oct.get(output)})
-	        """
-	        #for source, data in display_data:
-	        #    self._publish_display_data(source, data)
-	        self._publish_display_data(data=display_data)
+            """
+            if args.output:
+                for output in ','.join(args.output).split(','):
+                    output = unicode_to_str(output)
+                    self.shell.push({output: self._oct.get(output)})
+            """
+            #for source, data in display_data:
+            #    self._publish_display_data(source, data)
+            self._publish_display_data(data=display_data)
 
         if return_output:
             return tree if not mtg else mtg
-
+        return None
 
     @skip_doctest
     @magic_arguments()
@@ -406,7 +394,7 @@ class LpyMagics(Magics):
     @needs_local_scope
     @line_cell_magic
     def lpy_iter(self, line, cell=None, local_ns=None):
-        '''
+        """
         Execute code in Lpy, and pull some of the results back into the
         Python namespace.
 
@@ -448,7 +436,7 @@ class LpyMagics(Magics):
             In [18]: %%lpy -s 600,800 -f svg
                 ...: plot([1, 2, 3]);
 
-        '''
+        """
         args = parse_argstring(self.lpy, line)
 
         # arguments 'code' in line are prepended to the cell lines
@@ -531,6 +519,8 @@ class LpyMagics(Magics):
 
         if return_output:
             return tree if not args.mtg else g
+        return None
+
 
 __doc__ = __doc__.format(
     LPY_DOC = ' '*8 + LpyMagics.lpy.__doc__,

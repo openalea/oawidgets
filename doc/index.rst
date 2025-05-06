@@ -15,8 +15,9 @@ Welcome to oawidgets's documentation!
 
    Home <self>
    readme
-   usage
+   gallery
    authors
+   license
 
 
 
@@ -25,22 +26,6 @@ Welcome to oawidgets's documentation!
    More documentation on OpenAlea can be found on the
    `OpenAlea <https://openalea.readthedocs.io>`__ website.
 
-Authors
-=======
 
-.. include:: ../AUTHORS.rst
 
-License
-=======
 
-oawidgets is released under a Cecill-C License.
-
-.. note:: `Cecill-C <http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html>`_
-    license is a LGPL compatible license.
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

@@ -1,7 +1,10 @@
 from __future__ import absolute_import
 
+import uuid
+
 from openalea.mtg import traversal
 from pyvis.network import Network
+
 try:
     import colorcet as cc
 except ImportError:
@@ -21,11 +24,12 @@ def dict2html(args, properties=None):
     return '<br>'.join(['%s %s'%(k, args[k]) for k in properties])
 
 
-def plot(g, properties=None, selection=None, hlayout=True, scale=None, labels=None, height='800px', width='900px', **kwds):
+def plot(g, properties=None, selection=None, hlayout=True, scale=None, labels=None, height='800px', width='900px', cdn_resources='in_line', **kwds):
     """Plot a MTG in the Jupyter Notebook"""
     G = Network(notebook=True, directed=True,
                 layout=hlayout, heading="",
-                height=height, width=width)
+                height=height, width=width, 
+                cdn_resources=cdn_resources)
 
     if hlayout:
         G.hrepulsion()
@@ -118,4 +122,10 @@ def plot(g, properties=None, selection=None, hlayout=True, scale=None, labels=No
         label_edge = g.edge_type(edge[1])
         G.add_edge(edge[0], edge[1], label=label_edge, width=edge[2])
 
-    return G.show('mtg.html')
+    # Name of the graph
+    #uid = uuid.uuid4().hex
+    #name = f"mtg_{uid}.html"
+    name = 'mtg.html'
+
+    return G.show(name)
+

@@ -1,6 +1,6 @@
-=====
-Usage
-=====
+=======
+Gallery
+=======
 
 .. nbgallery::
 

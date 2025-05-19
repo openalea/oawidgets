@@ -1,10 +1,11 @@
-import openalea
 import openalea.plantgl.all as pgl
 from oawidgets.plantgl import PlantGL
 from oawidgets.plantgl import MTG as MTGPlantGL
 from openalea.mtg import MTG
 
-from openalea.deploy.shared_data import shared_data
+import pathlib
+
+data = pathlib.Path(__file__).parent.resolve() / "data"
 
 
 def test_scene():
@@ -67,7 +68,6 @@ def test_text():
 
 
 def test_mtg():
-    data = shared_data(openalea.mtg)
     g = MTG(data / "boutdenoylum2.mtg")
 
     p = MTGPlantGL(g, "edge_type")

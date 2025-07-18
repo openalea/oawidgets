@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+import pathlib
+
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -160,3 +162,17 @@ texinfo_documents = [
 ]
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {"python": ("https://docs.python.org/", None)}
+
+
+def copy_oawidget_folder(app, exception):
+    if exception is None:
+        src = pathlib.Path(app.srcdir)/"examples"
+        dst = pathlib.Path(app.outdir)/"examples"
+        if src.exists():
+            dst.mkdir(parents=True, exist_ok=True)
+            for file in src.glob("mtg*.html"):
+                target = dst / file.name
+                target.write_bytes(file.read_bytes())
+
+def setup(app):
+    app.connect("build-finished", copy_oawidget_folder)

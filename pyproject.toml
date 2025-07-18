@@ -59,6 +59,3 @@ readme = {file = ["README.md"]}
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["*"]
-
-[tool.setuptools.package-data]
-"*" = ["*.so", "*.dylib", "*.dll", "*.pyx","*.cpp","*.c","*.h"]

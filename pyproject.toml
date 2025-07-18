@@ -1,6 +1,19 @@
 [build-system]
-requires = ["setuptools"]
+requires = [
+    "setuptools",
+    "setuptools_scm",
+]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["*"]
+
+[tool.setuptools]
+include-package-data = false # force explicit declaration of data (disable automatic inclusion)
+
+# enable dynamic version based on git tags
+[tool.setuptools_scm]
 
 [project]
 name = "oawidgets"
@@ -9,9 +22,12 @@ authors = [
   { name = "Christophe Pradal"},
 ]
 description = "OpenAlea Widgets for Jupyter"
-license = {file = "LICENSE"}
+readme = "README.md"
+license = "CECILL-C"
+license-files = ["LICEN[CS]E*"]
+requires-python = ">=3.10"
+dynamic = ["version"]
 keywords = ["openalea", "jupyter", "widgets", "MTG", "lpy", "plantgl", "3D"]
-requires-python = ">=3.8"
 classifiers = [
   "Intended Audience :: Science/Research",
   "Intended Audience :: Developers",
@@ -19,14 +35,11 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering",
 ]
-dynamic = ["version", "readme"]
 dependencies = [
   "ipython",
   "k3d",
@@ -35,8 +48,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = [
+  "pytest",
+  "nbmake",
+]
+dev = [
+  "pytest >=6",
+  "pytest-cov >=3",
+]
 doc = [
+  "sphinx-autobuild",
   "pydata-sphinx-theme",
   "myst-parser",
   "sphinx-favicon",
@@ -46,16 +67,19 @@ doc = [
   "nbsphinx",
 ]
 
+# section specific to conda-only distributed package (not used by pip yet)
+[tool.conda.environment]
+channels = [
+  "openalea3",
+  "conda-forge"
+]
+dependencies = [
+    "openalea.mtg",
+]
+
 [project.urls]
-Homepage = "https://openalea.readthedocs.io/"
+Homepage = "https://oawidgets.readthedocs.io/"
 "Bug Tracker" = "https://github.com/openalea-incubator/oawidgets/issues"
 Discussions = "https://github.com/openalea-incubator/oawidgets/discussions"
 Changelog = "https://github.com/openalea-incubator/oawidgets/releases"
 
-[tool.setuptools.dynamic]
-version = {attr = "oawidgets.__version__"}
-readme = {file = ["README.md"]}
-
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["*"]

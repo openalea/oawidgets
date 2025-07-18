@@ -39,6 +39,21 @@ requirements:
     - {{ dep }}
     {% endfor %}
 
+test:
+  requires:
+    - pytest
+    - openalea.lpy
+    - openalea.plantgl
+    - openalea.mtg
+    - pathlib
+    - IPython
+  imports:
+    - oawidgets
+  source_files:
+    - test/**
+  commands:
+    - pytest -v
+
 about:
   home: {{ home }}
   summary: {{ description }}

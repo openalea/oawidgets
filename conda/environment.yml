@@ -1,11 +1,12 @@
-name: oawidgets
+name: oawidgets_dev
 channels:
+  - openalea3/label/dev
   - openalea3
   - conda-forge
 dependencies:
   - python  >=3.6
   - openalea.mtg
-  - openalea.deploy
+  - openalea.plantgl
   - openalea.hydroshoot
   - openalea.lpy
   - k3d

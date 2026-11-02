@@ -9,9 +9,6 @@ import matplotlib
 import numpy as np
 import k3d
 
-import six
-from six.moves import zip
-
 def rgb2hex(r,g,b):
     """Convert an RGB value to an hex value"""
     return (r << 16) | (g << 8) | b
@@ -233,7 +230,7 @@ def mtg2mesh(g, property_name):
     prop = g.property(property_name)
     vertices, indices, attr = [], [], []
     offset = 0
-    for vid, geom in six.iteritems(geometry):
+    for vid, geom in geometry.items():
         if vid in prop:
             geom.apply(d)
             idl = np.array([tuple(index) for index in list(d.discretization.indexList)])+offset

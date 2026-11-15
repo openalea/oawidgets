@@ -47,7 +47,7 @@ classifiers = [
 ]
 dependencies = [
   "ipython",
-  "k3d",
+  "k3d!=3.0.0,!=3.0.1",
   "pyvis",
 ]
 

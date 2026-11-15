@@ -29,13 +29,14 @@ oawidgets does not install the packages it displays: install the ones you use.
 | To use | Module | Install also |
 | --- | --- | --- |
 | 3D view of PlantGL objects and scenes | `openalea.widgets.plantgl` | `openalea.plantgl` |
-| The `%%lpy` magic | `openalea.widgets.lpymagic` | `openalea.lpy` and `openalea.mtg` |
+| The `%%lpy` magic | `openalea.widgets.lpymagic` | `openalea.lpy` |
+| The `%%lpy` magic, with MTG inputs and outputs (`-g`) | `openalea.widgets.lpymagic` | `openalea.lpy` and `openalea.mtg` |
 | Graph view of an MTG | `openalea.widgets.mtg` | `openalea.mtg` |
 
 For example, for the lpy magic:
 
 ```bash
-mamba install -c openalea3 -c conda-forge openalea.widgets openalea.lpy openalea.mtg
+mamba install -c openalea3 -c conda-forge openalea.widgets openalea.lpy
 ```
 
 ### Usage :

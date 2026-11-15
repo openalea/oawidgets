@@ -54,14 +54,23 @@ from IPython.core.magic_arguments import (
 )
 from IPython.display import display
 from IPython.testing.skipdoctest import skip_doctest
+# openalea.mtg is optional: without it, the magics work with axial trees, and
+# only the conversions from and to MTGs (MTG workstring, -g/--mtg) need it
 try:
     from openalea.mtg import MTG
     from openalea.mtg.io import mtg2lpy, lpy2mtg
-except ImportError as error:
-    raise ImportError(
-        "openalea.widgets.lpymagic converts L-Py strings to MTGs, and needs openalea.mtg: "
-        "mamba install -c openalea3 -c conda-forge openalea.mtg"
-    ) from error
+except ImportError:
+    MTG = None
+
+
+def _lpy2mtg(tree, lsystem, scene):
+    """MTG of the axial tree (-g/--mtg option), which needs openalea.mtg."""
+    if MTG is None:
+        raise ImportError(
+            "the -g/--mtg option converts the result to an MTG, and needs openalea.mtg: "
+            "mamba install -c openalea3 -c conda-forge openalea.mtg"
+        )
+    return lpy2mtg(tree, lsystem, scene=scene)
 
 from openalea.widgets import plantgl
 
@@ -169,7 +178,7 @@ class LpyMagics(Magics):
     @argument(
         '-g', '--mtg', action='append',
         help='Names of MTG variable to be pulled from Lpy after executing cell '
-             'body. '
+             'body (needs openalea.mtg). '
         )
     @argument(
         '-s', '--scene', action='append',
@@ -291,7 +300,7 @@ class LpyMagics(Magics):
                 self._lsys.makeCurrent()
                 workstring = lpy.AxialTree(workstring)
                 self._lsys.done()
-            elif isinstance(workstring, MTG):
+            elif MTG is not None and isinstance(workstring, MTG):
                 workstring = mtg2lpy(workstring,self._lsys)
             else:
                 pass
@@ -332,7 +341,7 @@ class LpyMagics(Magics):
         mtg = None
         if args.mtg:
             mtg_name = str(args.mtg[0])
-            mtg = lpy2mtg(tree, self._lsys, scene=scene)
+            mtg = _lpy2mtg(tree, self._lsys, scene=scene)
             self.shell.push({mtg_name: mtg})
 
         if args.format is not None:
@@ -389,7 +398,8 @@ class LpyMagics(Magics):
         )
     @argument(
         '-g', '--mtg', action='append',
-        help='Name of MTG variable to be pulled from LPy after executing cell.'
+        help='Name of MTG variable to be pulled from LPy after executing cell '
+             '(needs openalea.mtg).'
         )
 
     @argument(
@@ -468,7 +478,7 @@ class LpyMagics(Magics):
             except KeyError:
                 ws = self.shell.user_ns[workstring]
 
-            if isinstance(ws,MTG):
+            if MTG is not None and isinstance(ws, MTG):
                 workstring = mtg2lpy(ws,self._lsys)
             else:
                 workstring = ws
@@ -494,7 +504,7 @@ class LpyMagics(Magics):
         g = None
         if args.mtg:
             mtg_name = str(args.mtg[0])
-            g = lpy2mtg(tree, self._lsys, scene=scene)
+            g = _lpy2mtg(tree, self._lsys, scene=scene)
             self.shell.push({mtg_name: g})
 
         if args.format is not None:

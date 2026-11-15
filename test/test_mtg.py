@@ -1,5 +1,8 @@
-from openalea.mtg import MTG
-from openalea.widgets.mtg import plot
+import pytest
+
+MTG = pytest.importorskip("openalea.mtg").MTG
+
+from openalea.widgets.mtg import plot  # noqa: E402
 import pathlib
 
 data = pathlib.Path(__file__).parent.resolve() / "data"

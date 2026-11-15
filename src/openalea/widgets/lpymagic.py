@@ -63,14 +63,17 @@ except ImportError:
     MTG = None
 
 
-def _lpy2mtg(tree, lsystem, scene):
-    """MTG of the axial tree (-g/--mtg option), which needs openalea.mtg."""
-    if MTG is None:
+def _check_mtg_option(args):
+    """Raise if the -g/--mtg option is used without openalea.mtg.
+
+    Checked before running the L-system: an error raised once it has run keeps
+    L-Py objects alive, which then crash the interpreter when it exits.
+    """
+    if args.mtg and MTG is None:
         raise ImportError(
             "the -g/--mtg option converts the result to an MTG, and needs openalea.mtg: "
             "mamba install -c openalea3 -c conda-forge openalea.mtg"
         )
-    return lpy2mtg(tree, lsystem, scene=scene)
 
 from openalea.widgets import plantgl
 
@@ -245,6 +248,7 @@ class LpyMagics(Magics):
 
         """
         args = parse_argstring(self.lpy, line)
+        _check_mtg_option(args)
 
         # arguments 'code' in line are prepended to the cell lines
         if cell is None:
@@ -341,7 +345,7 @@ class LpyMagics(Magics):
         mtg = None
         if args.mtg:
             mtg_name = str(args.mtg[0])
-            mtg = _lpy2mtg(tree, self._lsys, scene=scene)
+            mtg = lpy2mtg(tree, self._lsys, scene=scene)
             self.shell.push({mtg_name: mtg})
 
         if args.format is not None:
@@ -459,6 +463,7 @@ class LpyMagics(Magics):
 
         """
         args = parse_argstring(self.lpy, line)
+        _check_mtg_option(args)
 
         # arguments 'code' in line are prepended to the cell lines
         return_output = True
@@ -504,7 +509,7 @@ class LpyMagics(Magics):
         g = None
         if args.mtg:
             mtg_name = str(args.mtg[0])
-            g = _lpy2mtg(tree, self._lsys, scene=scene)
+            g = lpy2mtg(tree, self._lsys, scene=scene)
             self.shell.push({mtg_name: g})
 
         if args.format is not None:

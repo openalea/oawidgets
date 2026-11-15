@@ -4,7 +4,13 @@
 """
 from __future__ import absolute_import
 
-from openalea.plantgl.all import *
+try:
+    from openalea.plantgl.all import *
+except ImportError as error:
+    raise ImportError(
+        "openalea.widgets.plantgl displays PlantGL objects, and needs PlantGL: "
+        "mamba install -c openalea3 -c conda-forge openalea.plantgl"
+    ) from error
 import matplotlib
 import numpy as np
 import k3d

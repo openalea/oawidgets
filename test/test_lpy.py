@@ -2,6 +2,10 @@ import pytest
 
 from IPython.testing.globalipapp import start_ipython
 
+pytest.importorskip("openalea.lpy")
+pytest.importorskip("openalea.mtg")
+pytest.importorskip("openalea.plantgl")
+
 
 @pytest.fixture(scope="session")
 def session_ip():

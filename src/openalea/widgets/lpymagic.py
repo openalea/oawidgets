@@ -39,7 +39,13 @@ Usage
 from __future__ import absolute_import
 from __future__ import print_function
 
-import openalea.lpy as lpy
+try:
+    import openalea.lpy as lpy
+except ImportError as error:
+    raise ImportError(
+        "openalea.widgets.lpymagic runs L-Py, and needs it: "
+        "mamba install -c openalea3 -c conda-forge openalea.lpy"
+    ) from error
 from IPython.core.displaypub import publish_display_data
 from IPython.core.magic import (Magics, magics_class, line_magic,
                                 line_cell_magic, needs_local_scope)
@@ -48,8 +54,14 @@ from IPython.core.magic_arguments import (
 )
 from IPython.display import display
 from IPython.testing.skipdoctest import skip_doctest
-from openalea.mtg import MTG
-from openalea.mtg.io import mtg2lpy, lpy2mtg
+try:
+    from openalea.mtg import MTG
+    from openalea.mtg.io import mtg2lpy, lpy2mtg
+except ImportError as error:
+    raise ImportError(
+        "openalea.widgets.lpymagic converts L-Py strings to MTGs, and needs openalea.mtg: "
+        "mamba install -c openalea3 -c conda-forge openalea.mtg"
+    ) from error
 
 from openalea.widgets import plantgl
 

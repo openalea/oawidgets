@@ -1,6 +1,12 @@
 from __future__ import absolute_import
 
-from openalea.mtg import traversal
+try:
+    from openalea.mtg import traversal
+except ImportError as error:
+    raise ImportError(
+        "openalea.widgets.mtg displays MTGs, and needs openalea.mtg: "
+        "mamba install -c openalea3 -c conda-forge openalea.mtg"
+    ) from error
 from pyvis.network import Network
 
 from .display import iframe

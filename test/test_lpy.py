@@ -3,7 +3,6 @@ import pytest
 from IPython.testing.globalipapp import start_ipython
 
 pytest.importorskip("openalea.lpy")
-pytest.importorskip("openalea.mtg")
 pytest.importorskip("openalea.plantgl")
 
 
@@ -38,6 +37,22 @@ C --> f@Of
 endlsystem
 """
     ip.run_cell_magic(magic_name="lpy", line='-i * -w axiom -n 5 -s scene', cell=cell)
+
+
+def test_lpy_mtg_option_needs_mtg(ip, monkeypatch):
+    """Without openalea.mtg, the magic runs, but -g/--mtg says what to install."""
+    from openalea.widgets import lpymagic
+
+    monkeypatch.setattr(lpymagic, "MTG", None)
+    ip.run_cell(raw_cell="axiom = 'A'")
+    cell = """
+production:
+A --> A[+A]A[-A]
+endlsystem
+"""
+    ip.run_cell_magic(magic_name="lpy", line="-w axiom -n 2 -s scene", cell=cell)
+    with pytest.raises(ImportError, match="openalea.mtg"):
+        ip.run_cell_magic(magic_name="lpy", line="-w axiom -n 2 -g g", cell=cell)
 
 
 

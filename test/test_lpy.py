@@ -39,20 +39,21 @@ endlsystem
     ip.run_cell_magic(magic_name="lpy", line='-i * -w axiom -n 5 -s scene', cell=cell)
 
 
-def test_lpy_mtg_option_needs_mtg(ip, monkeypatch):
-    """Without openalea.mtg, the magic runs, but -g/--mtg says what to install."""
+def test_lpy_mtg_option_needs_mtg(monkeypatch):
+    """Without openalea.mtg, -g/--mtg says what to install, before running L-Py.
+
+    Checked without running the magic: an IPython test session that runs %%lpy
+    without -i crashes when the interpreter exits (L-Py and IPython teardown),
+    although the test passes.
+    """
+    from types import SimpleNamespace
+
     from openalea.widgets import lpymagic
 
     monkeypatch.setattr(lpymagic, "MTG", None)
-    ip.run_cell(raw_cell="axiom = 'A'")
-    cell = """
-production:
-A --> A[+A]A[-A]
-endlsystem
-"""
-    ip.run_cell_magic(magic_name="lpy", line="-w axiom -n 2 -s scene", cell=cell)
+    lpymagic._check_mtg_option(SimpleNamespace(mtg=None))
     with pytest.raises(ImportError, match="openalea.mtg"):
-        ip.run_cell_magic(magic_name="lpy", line="-w axiom -n 2 -g g", cell=cell)
+        lpymagic._check_mtg_option(SimpleNamespace(mtg=["g"]))
 
 
 

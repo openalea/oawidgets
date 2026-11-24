@@ -9,7 +9,7 @@ from IPython.core.formatters import DisplayFormatter
 
 import openalea.widgets.display as oa_display
 import openalea.widgets.sphinx as oa_sphinx
-from openalea.widgets.display import show_plot, use_snapshots
+from openalea.widgets.display import iframe, show_plot, use_snapshots
 
 WIDGET = "application/vnd.jupyter.widget-view+json"
 
@@ -43,6 +43,21 @@ def _snapshot_page(output):
     )
     assert match is not None
     return html.unescape(match.group(1))
+
+
+def test_iframe_has_no_extra_line_breaks():
+    # line breaks for docutils (str.splitlines) would end the raw HTML in nbsphinx
+    for page in [
+        '<script>var s = "\t\u2028\u2029\u00a0\u00e9";\n</script>\n',
+        '<script>var s = "\x0b\x0c\x1c\x1d\x1e\r\x85";\n</script>\n',
+    ]:
+        output = iframe(page, 'style="border: none"')
+        assert output.data.isascii()
+        assert len(output.data.splitlines()) == output.data.count("\n") + 1
+    # the browser gets the page back (html.unescape drops control characters)
+    assert _snapshot_page(output).endswith('\\u0085";\n</script>\n')
+    page = '<script>var s = "\t\u2028\u2029\u00a0\u00e9";\n</script>\n'
+    assert _snapshot_page(iframe(page, 'style="border: none"')) == page
 
 
 def test_show_plot_displays_an_online_snapshot(displayed):

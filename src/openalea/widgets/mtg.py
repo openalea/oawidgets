@@ -1,10 +1,9 @@
 from __future__ import absolute_import
 
-import html
-
-from IPython.display import HTML
 from openalea.mtg import traversal
 from pyvis.network import Network
+
+from .display import iframe
 
 try:
     import colorcet as cc
@@ -134,9 +133,5 @@ def patch_show(G, name=None):
     the name of the HTML file written by former versions).
     """
     page = G.generate_html(notebook=True)
-    # the div avoids the IPython warning about HTML starting with an iframe
-    return HTML(
-        f'<div><iframe srcdoc="{html.escape(page)}" width="{G.width}" '
-        f'height="{G.height}" style="border: none"></iframe></div>'
-    )
+    return iframe(page, f'width="{G.width}" height="{G.height}" style="border: none"')
 

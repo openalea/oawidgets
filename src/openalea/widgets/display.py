@@ -29,6 +29,38 @@ def _plot_class():
     return importlib.import_module("k3d.plot").Plot
 
 
+def iframe(page, attributes=""):
+    """An HTML output showing a whole HTML page, embedded in an iframe (srcdoc).
+
+    The iframe keeps the scripts of the page apart from the notebook or the
+    documentation page. Besides the HTML special characters, the control and
+    non-ASCII characters of the page are written as character references: some
+    of them are line breaks for docutils (U+2028, U+2029, U+0085, form feed...
+    in inlined scripts, such as vis-network for pyvis), which would end the raw
+    HTML of the output in a documentation built with nbsphinx.
+
+    The C1 controls (U+0080-U+009F) have no character reference (browsers read
+    them as windows-1252 characters): they are written as JavaScript escapes
+    (\\u0085), the same characters in the string literals of scripts, where
+    they are found (they have no use in HTML text).
+
+    Parameters
+    ----------
+    page : str
+        The HTML page.
+    attributes : str, optional
+        More attributes of the iframe, such as 'style="border: none"'.
+    """
+    srcdoc = "".join(
+        c if " " <= c <= "~" or c in "\n\t"
+        else f"\\u{ord(c):04x}" if "\x80" <= c <= "\x9f"
+        else f"&#x{ord(c):x};"
+        for c in html.escape(page)
+    )
+    # the div avoids the IPython warning about HTML starting with an iframe
+    return HTML(f'<div><iframe srcdoc="{srcdoc}" {attributes}></iframe></div>')
+
+
 def show_plot(plot, live=False):
     """Display a k3d plot in the notebook.
 
@@ -47,14 +79,7 @@ def show_plot(plot, live=False):
         return
     plot.snapshot_type = "online"
     page = plot.get_snapshot()
-    # the iframe keeps the scripts of the snapshot apart from the page; the div
-    # avoids the IPython warning about HTML starting with an iframe
-    display(
-        HTML(
-            f'<div><iframe srcdoc="{html.escape(page)}" '
-            f'style="width: 100%; height: {plot.height}px; border: none"></iframe></div>'
-        )
-    )
+    display(iframe(page, f'style="width: 100%; height: {plot.height}px; border: none"'))
 
 
 def use_snapshots(enable=True):

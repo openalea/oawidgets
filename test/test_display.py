@@ -1,5 +1,6 @@
 import html
 import re
+from types import SimpleNamespace
 
 import k3d
 import numpy as np
@@ -7,7 +8,10 @@ import pytest
 from IPython.core.formatters import DisplayFormatter
 
 import openalea.widgets.display as oa_display
-from openalea.widgets.display import show_plot, snapshot_display
+import openalea.widgets.sphinx as oa_sphinx
+from openalea.widgets.display import show_plot, use_snapshots
+
+WIDGET = "application/vnd.jupyter.widget-view+json"
 
 
 @pytest.fixture
@@ -16,6 +20,14 @@ def displayed(monkeypatch):
     objects = []
     monkeypatch.setattr(oa_display, "display", objects.append)
     return objects
+
+
+@pytest.fixture
+def snapshots():
+    """use_snapshots on during the test, off afterwards."""
+    use_snapshots()
+    yield
+    use_snapshots(False)
 
 
 def _plot():
@@ -42,24 +54,55 @@ def test_show_plot_displays_an_online_snapshot(displayed):
     assert f"https://unpkg.com/k3d@{k3d.__version__}/dist/standalone.js" in page
 
 
-def test_show_plot_live_displays_the_widget(monkeypatch, displayed):
-    plot = snapshot_display(_plot())
-    shown = []
-    monkeypatch.setattr(type(plot), "display", lambda self: shown.append(self))
-    show_plot(plot, live=True)
-    assert shown == [plot] and displayed == []
-    # displayed as a widget from now on
-    assert "_ipython_display_" not in plot.__dict__
+def test_plots_are_widgets_by_default():
+    data, _ = DisplayFormatter().format(_plot())
+    assert WIDGET in data
 
 
-def test_snapshot_display_as_cell_result(displayed):
-    plot = snapshot_display(_plot())
+def test_use_snapshots_for_cell_results(displayed, snapshots):
+    plot = _plot()
     # what the notebook does with the result of a cell
     data, _ = DisplayFormatter().format(plot)
     assert data == {}
     assert len(displayed) == 1
     _snapshot_page(displayed[0])
-    # objects can still be added, and other plots are widgets as before
+    # objects can still be added
     plot += k3d.points(np.ones((1, 3), dtype=np.float32), point_size=1.0)
-    other, _ = DisplayFormatter().format(k3d.plot())
-    assert "application/vnd.jupyter.widget-view+json" in other
+
+
+def test_use_snapshots_for_plot_display(displayed, snapshots):
+    # k3d's own idiom would otherwise show the widget in an Output widget
+    _plot().display()
+    assert len(displayed) == 1
+    _snapshot_page(displayed[0])
+
+
+def test_show_plot_live_is_the_k3d_widget_display(monkeypatch, displayed):
+    shown = []
+    # the class use_snapshots changes (plots are instances of a subclass of it)
+    monkeypatch.setattr(oa_display._plot_class(), "display", lambda self, **kw: shown.append(self))
+    use_snapshots()
+    try:
+        plot = _plot()
+        show_plot(plot, live=True)
+    finally:
+        use_snapshots(False)
+    assert shown == [plot] and displayed == []
+
+
+def test_use_snapshots_off_restores_widgets(displayed):
+    use_snapshots()
+    use_snapshots()  # twice: no effect
+    use_snapshots(False)
+    data, _ = DisplayFormatter().format(_plot())
+    assert WIDGET in data
+    assert displayed == []
+
+
+def test_sphinx_extension_sets_up_the_kernels():
+    config = SimpleNamespace(nbsphinx_execute_arguments=["--InlineBackend.figure_formats={'svg'}"])
+    oa_sphinx._add_kernel_setup(None, config)
+    assert config.nbsphinx_execute_arguments == [
+        "--InlineBackend.figure_formats={'svg'}",
+        "--IPKernelApp.exec_lines=from openalea.widgets.display import use_snapshots; use_snapshots()",
+    ]

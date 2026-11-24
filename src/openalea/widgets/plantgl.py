@@ -9,8 +9,6 @@ import matplotlib
 import numpy as np
 import k3d
 
-from .display import show_plot, snapshot_display
-
 def rgb2hex(r,g,b):
     """Convert an RGB value to an hex value"""
     return (r << 16) | (g << 8) | b
@@ -222,8 +220,7 @@ def PlantGL(pglobject, plot=None, group_by_color=True, property=None, side='fron
 
     plot.lighting = 3
     #plot.colorbar_object_id = randint(0, 1000)
-    # displayed as a snapshot in notebooks, also in static pages (see display.py)
-    return snapshot_display(plot)
+    return plot
 
 
 def mtg2mesh(g, property_name):
@@ -259,4 +256,4 @@ def MTG(g, property_name, plot=None):
     mesh = mtg2mesh(g, property_name)
     plot += mesh
     plot.lighting = 3
-    return snapshot_display(plot)
+    return plot

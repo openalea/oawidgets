@@ -1,18 +1,32 @@
-"""Display k3d plots in notebooks, also in static pages.
+"""Display k3d plots as snapshots, for static pages.
 
-k3d 3 widgets are anywidgets, which static pages (the documentation built with
+k3d 3 widgets are anywidgets, which static pages (documentation built with
 nbsphinx, notebooks saved with their outputs) cannot load: their 3D views stay
 empty. A k3d snapshot shows everywhere: an interactive 3D view (rotate, zoom,
 k3d panel) embedded in the cell output as HTML. It loads the k3d viewer from
 unpkg, so it needs an internet connection.
 
-PlantGL and MTG return plots marked with snapshot_display: the notebook shows
-them as snapshots, when they are the result of a cell or passed to IPython
-display. show_plot(plot, live=True) shows the k3d widget instead.
+In notebooks, PlantGL, MTG and k3d plots are k3d widgets, as usual. For a static
+page:
+
+- show_plot(plot) displays one plot as a snapshot;
+- use_snapshots() makes the notebook display every k3d plot as a snapshot: the
+  plots that are the result of a cell, passed to IPython display or shown with
+  plot.display(). The Sphinx extension openalea.widgets.sphinx calls it in the
+  kernels that nbsphinx starts to execute the notebooks of a documentation.
 """
 import html
+import importlib
 
 from IPython.display import HTML, display
+
+# k3d Plot.display, saved while use_snapshots replaces it
+_widget_display = None
+
+
+def _plot_class():
+    # k3d.plot is the plot function; the class is in the module of the same name
+    return importlib.import_module("k3d.plot").Plot
 
 
 def show_plot(plot, live=False):
@@ -26,12 +40,10 @@ def show_plot(plot, live=False):
         If False (default), display a snapshot of the plot: an interactive 3D
         view that also shows in static pages. If True, display the k3d widget,
         which stays connected to Python (for instance to change the plot after
-        displaying it); the plot is then displayed as a widget from now on.
+        displaying it), even when use_snapshots is on.
     """
     if live:
-        # back to the k3d widget display (see snapshot_display)
-        plot.__dict__.pop("_ipython_display_", None)
-        plot.display()
+        (_widget_display or type(plot).display)(plot)
         return
     plot.snapshot_type = "online"
     page = plot.get_snapshot()
@@ -45,17 +57,28 @@ def show_plot(plot, live=False):
     )
 
 
-def snapshot_display(plot):
-    """Make the notebook display plot as a snapshot (see show_plot).
+def use_snapshots(enable=True):
+    """Display every k3d plot as a snapshot (see show_plot), or as a widget again.
 
-    It applies when plot is the result of a cell, or is passed to IPython
-    display. Other plots are not affected. The plot is still a k3d plot:
-    objects can be added to it.
+    It applies to the plots that are the result of a cell, passed to IPython
+    display, or shown with plot.display(), in the current Python process (the
+    notebook kernel). Plots are still k3d plots: objects can be added to them.
 
-    Returns
-    -------
-    plot : the same plot
+    Parameters
+    ----------
+    enable : bool, optional
+        True (default) to display plots as snapshots, False to display them as
+        k3d widgets again.
     """
-    # IPython calls _ipython_display_ instead of showing the widget
-    plot._ipython_display_ = lambda: show_plot(plot)
-    return plot
+    global _widget_display
+    plot_class = _plot_class()
+    if enable and _widget_display is None:
+        _widget_display = plot_class.display
+        # IPython calls _ipython_display_ instead of showing the widget;
+        # k3d display() would show the widget inside an Output widget
+        plot_class._ipython_display_ = lambda self: show_plot(self)
+        plot_class.display = lambda self, **kwargs: show_plot(self)
+    elif not enable and _widget_display is not None:
+        del plot_class._ipython_display_
+        plot_class.display = _widget_display
+        _widget_display = None

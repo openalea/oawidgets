@@ -1,9 +1,10 @@
 from __future__ import absolute_import
 
-import uuid
+import html
 
+from IPython.display import HTML
 from openalea.mtg import traversal
-from pyvis.network import Network, IFrame
+from pyvis.network import Network
 
 try:
     import colorcet as cc
@@ -122,17 +123,20 @@ def plot(g, properties=None, selection=None, hlayout=True, scale=None, labels=No
         label_edge = g.edge_type(edge[1])
         G.add_edge(edge[0], edge[1], label=label_edge, width=edge[2])
 
-    # Name of the graph
-    #uid = uuid.uuid4().hex
-    #name = f"mtg_{uid}.html"
-    name = 'mtg.html'
+    return patch_show(G)
 
-    return patch_show(G, name=name)
+def patch_show(G, name=None):
+    """Return the network page embedded in an HTML output.
 
-def patch_show(G, name='mtg.html'):
-    """ Function to solve an error on windows about encoding """
-    html = G.generate_html(notebook=True)
-    with open(name, mode='w+', encoding='utf-8') as fp:
-        fp.write(html)
-    return IFrame(name, width=G.width, height=G.height)
+    The page is in the iframe itself (srcdoc), with its scripts (cdn_resources
+    'in_line'): it shows in notebooks and in static pages (documentation), each
+    plot keeps its own graph, and no file is written (name is ignored; it was
+    the name of the HTML file written by former versions).
+    """
+    page = G.generate_html(notebook=True)
+    # the div avoids the IPython warning about HTML starting with an iframe
+    return HTML(
+        f'<div><iframe srcdoc="{html.escape(page)}" width="{G.width}" '
+        f'height="{G.height}" style="border: none"></iframe></div>'
+    )
 

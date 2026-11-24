@@ -39,6 +39,7 @@ extensions = [
     "sphinx_favicon",      # support for favicon
     "sphinx_copybutton",      # support for copybutton in code blocks
     "nbsphinx",     # for integrating jupyter notebooks
+    "openalea.widgets.sphinx",  # k3d plots of the notebooks as snapshots, for static pages
     "myst_parser"   # for parsing .md files
 ]
 # Add any paths that contain templates here, relative to this directory.

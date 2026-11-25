@@ -10,3 +10,4 @@ Gallery
     ./examples/pyvis_test
     ./examples/sphere
     ./examples/hydroshoot_tutorial/hydroshoot_grapevine
+    ./examples/encoding3d_scenes

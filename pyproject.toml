@@ -92,6 +92,7 @@ dependencies = [
     "openalea.mtg",
     "openalea.plantgl",
     "openalea.lpy",
+    "openalea.encoding3d",
 ]
 
 [project.urls]

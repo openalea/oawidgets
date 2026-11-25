@@ -1,6 +1,12 @@
 from __future__ import absolute_import
 
-from openalea.mtg import traversal
+try:
+    from openalea.mtg import traversal
+except ImportError as error:
+    raise ImportError(
+        "openalea.widgets.mtg displays MTGs, and needs openalea.mtg: "
+        "mamba install -c openalea3 -c conda-forge openalea.mtg"
+    ) from error
 from pyvis.network import Network
 
 from .display import iframe
@@ -51,8 +57,7 @@ def plot(g, properties=None, selection=None, hlayout=True, scale=None, labels=No
     #Data
     vids = g.vertices(scale=scale)
     edges = [(g.parent(vid), vid, 6 if g.edge_type(vid) == '<' else 1)
-             for vid in vids if g.parent(vid) is not None]#, 'black' if g.edge_type(vid) == '<' else None
-    pos = g.property('position')
+             for vid in vids if g.parent(vid) is not None]
 
     #Level determination
     levels = {}
@@ -65,9 +70,7 @@ def plot(g, properties=None, selection=None, hlayout=True, scale=None, labels=No
     component_roots[root] = True
     for vid in traversal.pre_order(g, root):
         pid = g.parent(vid)
-        if pid is None:
-            component_roots[vid] = True
-        elif g.complex(pid) != g.complex(vid):
+        if pid is None or g.complex(pid) != g.complex(vid):
             component_roots[vid] = True
 
     #Groups
@@ -93,29 +96,13 @@ def plot(g, properties=None, selection=None, hlayout=True, scale=None, labels=No
         else:
             color = '#fb7e81' if vid in selection else '#97c2fc'
         title = dict2html(g[vid], properties=properties)
-        #gap, mult = max(pos[1])-min(pos[1]), 20
-        #x = mult*pos[g.parent(vid)][0] if g.parent(vid) else pos[vid][0]
-        # #y = mult*(gap - pos[vid][1]) #if g.parent(vid) else None
-        #physics = False if ('edge_type' not in g[vid] or g[vid]['edge_type']=='<' or g.nb_children(vid)>0) else True
         G.add_node(vid, shape=shape,
                     label=label_node,
                     level=level,
                     color=color,
                     title=title,
                     borderWidth=3,
-                    #x=x,
-                    #y=y,
-                    #physics=physics,
                     )
-
-    #Cluster
-    if False:
-        for vid in traversal.pre_order(g, g.complex(root)):
-            G.add_node(vid, hidden=True)
-            if g.parent(vid):
-                G.add_edge(g.parent(vid), vid, hidden=True)
-            for cid in g.components(vid):
-                G.add_edge(vid, cid, hidden=True)
 
     #Edges adding
     for edge in edges:

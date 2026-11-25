@@ -2,19 +2,19 @@
 
 [![Docs](https://readthedocs.org/projects/oawidgets/badge/?version=latest)](https://oawidgets.readthedocs.io/)
 [![Build Status](https://github.com/openalea/oawidgets/actions/workflows/openalea_ci.yml/badge.svg)](https://github.com/openalea/oawidgets/actions/workflows/openalea_ci.yml?query=branch%3Amaster)
-[![Python Version](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License--CeCILL-C-blue)](https://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 [![Anaconda-Server Badge](https://anaconda.org/openalea3/openalea.widgets/badges/version.svg)](https://anaconda.org/openalea3/openalea.widgets)
 
 
-widgets is a set of OpenAlea widgets for jupyter notebooks allowing to: 
-- use a magic to use [LPy](https://lpy.readthedocs.io) language
+oawidgets (`openalea.widgets`) is a set of OpenAlea widgets for jupyter notebooks allowing to: 
+- use magics to use [LPy](https://lpy.readthedocs.io) language
 - display interactive 3D plant architectures, using [openalea.plantgl](https://github.com/openalea/plantgl)
 - display [MTG](https://mtg.readthedocs.io) to explore for instance class and number of vertices, number of scales, properties, using [Pyvis](https://pyvis.readthedocs.io)
 - show these 3D views, and any [k3d](https://k3d-jupyter.org) plot, in static pages such as a documentation built with nbsphinx, through a Sphinx extension (see [below](#notebooks-in-a-documentation-static-pages))
 
 
-### Authors
+## Authors
 
 > - Baptiste Brument
 > - Christophe Pradal
@@ -25,22 +25,39 @@ widgets is a set of OpenAlea widgets for jupyter notebooks allowing to:
 mamba install -c openalea3 -c conda-forge openalea.widgets
 ```
 
-If you want to use the lpy extension, install also lpy
+oawidgets does not install the packages it displays: install the ones you use.
+
+| To use | Module | Install also |
+| --- | --- | --- |
+| 3D view of PlantGL objects and scenes, and of MTG properties (`MTG(g, 'Length')`) | `openalea.widgets.plantgl` | `openalea.plantgl` |
+| The lpy magics (`%%lpy`, `%%lpy_iter`, `%lpy_axiom`, `%lpy_rule`) | `openalea.widgets.lpymagic` | `openalea.lpy` |
+| The lpy magics, with MTG inputs and outputs (`-g`) | `openalea.widgets.lpymagic` | `openalea.lpy` and `openalea.mtg` |
+| Graph view of an MTG | `openalea.widgets.mtg` | `openalea.mtg` |
+
+For example, for the lpy magic:
 
 ```bash
 mamba install -c openalea3 -c conda-forge openalea.widgets openalea.lpy
 ```
 
-### Usage :
+## Usage
+
+The lpy magics are loaded in a notebook with:
+
+```python
+%load_ext openalea.widgets.lpymagic
+```
 
 See documentation and notebook examples on [https://oawidgets.readthedocs.io](https://oawidgets.readthedocs.io).
 
-### Notebooks in a documentation (static pages)
+## Notebooks in a documentation (static pages)
 
-The 3D views (PlantGL, MTG, lpy magic, and any k3d plot) are k3d widgets: they stay
-empty in static pages, such as a documentation built with nbsphinx or a notebook saved
-with its outputs. They show there as snapshots: interactive 3D views (rotate, zoom)
-embedded in the page, which need an internet connection to load the k3d viewer.
+The 3D views (PlantGL objects and scenes, MTG properties, lpy magics, and any k3d plot)
+are k3d widgets: they stay empty in static pages, such as a documentation built with
+nbsphinx or a notebook saved with its outputs. They show there as snapshots: interactive
+3D views (rotate, zoom) embedded in the page, which need an internet connection to load
+the k3d viewer. The graph view of an MTG (`openalea.widgets.mtg`) is plain HTML: it
+shows in static pages as it is.
 
 **Documentation built with nbsphinx (recommended).** Add the Sphinx extension of
 openalea.widgets to the `conf.py` of the documentation, nothing else to do:
@@ -67,7 +84,7 @@ use_snapshots()   # every k3d plot displayed from now on, as with the extension
 
 `show_plot(plot, live=True)` still displays the live widget.
 
-### License
+## License
 
 Our code is released under [Cecill-C](https://cecill.info/licences/Licence_CeCILL_V1.1-US.txt) licence. (see LICENSE file for details).
 

@@ -39,7 +39,13 @@ Usage
 from __future__ import absolute_import
 from __future__ import print_function
 
-import openalea.lpy as lpy
+try:
+    import openalea.lpy as lpy
+except ImportError as error:
+    raise ImportError(
+        "openalea.widgets.lpymagic runs L-Py, and needs it: "
+        "mamba install -c openalea3 -c conda-forge openalea.lpy"
+    ) from error
 from IPython.core.displaypub import publish_display_data
 from IPython.core.magic import (Magics, magics_class, line_magic,
                                 line_cell_magic, needs_local_scope)
@@ -48,8 +54,26 @@ from IPython.core.magic_arguments import (
 )
 from IPython.display import display
 from IPython.testing.skipdoctest import skip_doctest
-from openalea.mtg import MTG
-from openalea.mtg.io import mtg2lpy, lpy2mtg
+# openalea.mtg is optional: without it, the magics work with axial trees, and
+# only the conversions from and to MTGs (MTG workstring, -g/--mtg) need it
+try:
+    from openalea.mtg import MTG
+    from openalea.mtg.io import mtg2lpy, lpy2mtg
+except ImportError:
+    MTG = None
+
+
+def _check_mtg_option(args):
+    """Raise if the -g/--mtg option is used without openalea.mtg.
+
+    Checked before running the L-system: an error raised once it has run keeps
+    L-Py objects alive, which then crash the interpreter when it exits.
+    """
+    if args.mtg and MTG is None:
+        raise ImportError(
+            "the -g/--mtg option converts the result to an MTG, and needs openalea.mtg: "
+            "mamba install -c openalea3 -c conda-forge openalea.mtg"
+        )
 
 from openalea.widgets import plantgl
 
@@ -157,7 +181,7 @@ class LpyMagics(Magics):
     @argument(
         '-g', '--mtg', action='append',
         help='Names of MTG variable to be pulled from Lpy after executing cell '
-             'body. '
+             'body (needs openalea.mtg). '
         )
     @argument(
         '-s', '--scene', action='append',
@@ -224,6 +248,7 @@ class LpyMagics(Magics):
 
         """
         args = parse_argstring(self.lpy, line)
+        _check_mtg_option(args)
 
         # arguments 'code' in line are prepended to the cell lines
         if cell is None:
@@ -279,7 +304,7 @@ class LpyMagics(Magics):
                 self._lsys.makeCurrent()
                 workstring = lpy.AxialTree(workstring)
                 self._lsys.done()
-            elif isinstance(workstring, MTG):
+            elif MTG is not None and isinstance(workstring, MTG):
                 workstring = mtg2lpy(workstring,self._lsys)
             else:
                 pass
@@ -377,7 +402,8 @@ class LpyMagics(Magics):
         )
     @argument(
         '-g', '--mtg', action='append',
-        help='Name of MTG variable to be pulled from LPy after executing cell.'
+        help='Name of MTG variable to be pulled from LPy after executing cell '
+             '(needs openalea.mtg).'
         )
 
     @argument(
@@ -437,6 +463,7 @@ class LpyMagics(Magics):
 
         """
         args = parse_argstring(self.lpy, line)
+        _check_mtg_option(args)
 
         # arguments 'code' in line are prepended to the cell lines
         return_output = True
@@ -456,7 +483,7 @@ class LpyMagics(Magics):
             except KeyError:
                 ws = self.shell.user_ns[workstring]
 
-            if isinstance(ws,MTG):
+            if MTG is not None and isinstance(ws, MTG):
                 workstring = mtg2lpy(ws,self._lsys)
             else:
                 workstring = ws

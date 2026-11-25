@@ -29,7 +29,7 @@ description = "OpenAlea Widgets for Jupyter"
 readme = "README.md"
 license = "CECILL-C"
 license-files = ["LICEN[CS]E*"]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dynamic = ["version"]
 keywords = ["openalea", "jupyter", "widgets", "MTG", "lpy", "plantgl", "3D"]
 classifiers = [
@@ -49,6 +49,8 @@ dependencies = [
   "ipython",
   "k3d",
   "pyvis",
+  # openalea.plantgl, openalea.lpy and openalea.mtg are not dependencies:
+  # each module of openalea.widgets needs the one it displays (see README.md)
 ]
 
 [project.optional-dependencies]
@@ -80,10 +82,16 @@ channels = [
   "conda-forge"
 ]
 dependencies = [
+    "matplotlib-base",
+]
+
+# conda-only test requirements of the conda package (conda/meta.yaml): the
+# packages displayed by the modules, which are not on PyPI
+[tool.conda.test]
+dependencies = [
     "openalea.mtg",
     "openalea.plantgl",
     "openalea.lpy",
-    "matplotlib-base",
 ]
 
 [project.urls]

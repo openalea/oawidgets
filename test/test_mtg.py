@@ -2,8 +2,11 @@ import html
 import pathlib
 import re
 
-from openalea.mtg import MTG
-from openalea.widgets.mtg import plot
+import pytest
+
+MTG = pytest.importorskip("openalea.mtg").MTG
+
+from openalea.widgets.mtg import plot  # noqa: E402
 
 data = pathlib.Path(__file__).parent.resolve() / "data"
 

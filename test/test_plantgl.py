@@ -1,7 +1,9 @@
-import openalea.plantgl.all as pgl
-from openalea.widgets.plantgl import PlantGL
-from openalea.widgets.plantgl import MTG as MTGPlantGL
-from openalea.mtg import MTG
+import pytest
+
+pgl = pytest.importorskip("openalea.plantgl.all")
+
+from openalea.widgets.plantgl import PlantGL  # noqa: E402
+from openalea.widgets.plantgl import MTG as MTGPlantGL  # noqa: E402
 
 import pathlib
 
@@ -68,6 +70,7 @@ def test_text():
 
 
 def test_mtg():
+    MTG = pytest.importorskip("openalea.mtg").MTG
     g = MTG(data / "boutdenoylum2.mtg")
 
     p = MTGPlantGL(g, "edge_type")

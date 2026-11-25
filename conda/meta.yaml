@@ -8,6 +8,7 @@
 {% set deps = pyproject.get('project', {}).get('dependencies', []) %}
 {% set conda_deps = pyproject.get('tool', {}).get('conda', {}).get('environment', {}).get('dependencies',[]) %}
 {% set test_deps = pyproject.get('project', {}).get('optional-dependencies', {}).get('test',[]) %}
+{% set conda_test_deps = pyproject.get('tool', {}).get('conda', {}).get('test', {}).get('dependencies',[]) %}
 
 package:
   name: {{ name }}
@@ -38,7 +39,7 @@ requirements:
 
 test:
   requires:
-    {% for dep in test_deps %}
+    {% for dep in test_deps + conda_test_deps %}
     - {{ dep }}
     {% endfor %}
   imports:

@@ -59,29 +59,38 @@ def plot(g, properties=None, selection=None, hlayout=True, scale=None, labels=No
     edges = [(g.parent(vid), vid, 6 if g.edge_type(vid) == '<' else 1)
              for vid in vids if g.parent(vid) is not None]
 
+    # Roots of the trees at the scale (one per plant when the MTG has several
+    # plants), and of the trees of their complexes
+    roots = [vid for vid in vids if g.parent(vid) is None]
+    complex_roots = list(dict.fromkeys(
+        cid for cid in (g.complex(vid) for vid in vids) if g.parent(cid) is None))
+
     #Level determination
     levels = {}
-    root = next(g.component_roots_at_scale_iter(g.root, scale=scale))
-    for vid in traversal.pre_order(g, root):
-        levels[vid] = 0 if g.parent(vid) is None else levels[g.parent(vid)]+1
+    for root in roots:
+        for vid in traversal.pre_order(g, root):
+            levels[vid] = 0 if g.parent(vid) is None else levels[g.parent(vid)]+1
 
     #Component roots
     component_roots = {}
-    component_roots[root] = True
-    for vid in traversal.pre_order(g, root):
-        pid = g.parent(vid)
-        if pid is None or g.complex(pid) != g.complex(vid):
-            component_roots[vid] = True
+    for root in roots:
+        for vid in traversal.pre_order(g, root):
+            pid = g.parent(vid)
+            if pid is None or g.complex(pid) != g.complex(vid):
+                component_roots[vid] = True
 
     #Groups
     groups = {}
-    for count, vid in enumerate(traversal.pre_order(g, g.complex(root))):
-        nc = len(colors)
-        groups[vid] = colors[count%nc]
-        pid = g.parent(vid)
-        if pid:
-            if groups[vid] == groups[pid]:
-                groups[vid] = colors[(1789*count+17)%nc]
+    nc = len(colors)
+    count = 0
+    for root in complex_roots:
+        for vid in traversal.pre_order(g, root):
+            groups[vid] = colors[count%nc]
+            pid = g.parent(vid)
+            if pid:
+                if groups[vid] == groups[pid]:
+                    groups[vid] = colors[(1789*count+17)%nc]
+            count += 1
 
     #Nodes adding
     for vid in vids:

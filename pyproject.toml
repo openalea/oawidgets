@@ -29,7 +29,7 @@ description = "OpenAlea Widgets for Jupyter"
 readme = "README.md"
 license = "CECILL-C"
 license-files = ["LICEN[CS]E*"]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dynamic = ["version"]
 keywords = ["openalea", "jupyter", "widgets", "MTG", "lpy", "plantgl", "3D"]
 classifiers = [

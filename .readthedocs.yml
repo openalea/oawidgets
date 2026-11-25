@@ -1,7 +1,8 @@
 version: 2
 
 build:
-  # glibc 2.39: openalea.libcaribu 3.1.1 (run by hydroshoot) needs glibc 2.38
+  # glibc 2.39: the openalea.libcaribu 3.1.1 binaries (hydroshoot dependency) need
+  # glibc 2.38, in case a notebook runs them
   os: "ubuntu-24.04"
   tools:
     python: "mambaforge-22.9"

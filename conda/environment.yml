@@ -8,6 +8,7 @@ dependencies:
   - openalea.plantgl
   - openalea.lpy
   - openalea.hydroshoot
+  - openalea.encoding3d
   - k3d
   - pyvis
   - matplotlib-base

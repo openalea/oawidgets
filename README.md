@@ -11,6 +11,7 @@ oawidgets (`openalea.widgets`) is a set of OpenAlea widgets for jupyter notebook
 - use magics to use [LPy](https://lpy.readthedocs.io) language
 - display interactive 3D plant architectures, using [openalea.plantgl](https://github.com/openalea/plantgl)
 - display [MTG](https://mtg.readthedocs.io) to explore for instance class and number of vertices, number of scales, properties, using [Pyvis](https://pyvis.readthedocs.io)
+- display [encoding3d](https://encoding3d.readthedocs.io) scenes of functional-structural plant models (plants, soil grids, sequences of frames), colored by their variables
 - show these 3D views, and any [k3d](https://k3d-jupyter.org) plot, in static pages such as a documentation built with nbsphinx, through a Sphinx extension (see [below](#notebooks-in-a-documentation-static-pages))
 
 
@@ -33,6 +34,7 @@ oawidgets does not install the packages it displays: install the ones you use.
 | The lpy magics (`%%lpy`, `%%lpy_iter`, `%lpy_axiom`, `%lpy_rule`) | `openalea.widgets.lpymagic` | `openalea.lpy` |
 | The lpy magics, with MTG inputs and outputs (`-g`) | `openalea.widgets.lpymagic` | `openalea.lpy` and `openalea.mtg` |
 | Graph view of an MTG | `openalea.widgets.mtg` | `openalea.mtg` |
+| 3D view of an encoding3d scene or sequence (`Encoding3D('scene.glb', variable='radius')`) | `openalea.widgets.encoding3d` | `openalea.encoding3d` |
 
 For example, for the lpy magic:
 
@@ -52,7 +54,7 @@ See documentation and notebook examples on [https://oawidgets.readthedocs.io](ht
 
 ## Notebooks in a documentation (static pages)
 
-The 3D views (PlantGL objects and scenes, MTG properties, lpy magics, and any k3d plot)
+The 3D views (PlantGL objects and scenes, MTG properties, lpy magics, encoding3d scenes, and any k3d plot)
 are k3d widgets: they stay empty in static pages, such as a documentation built with
 nbsphinx or a notebook saved with its outputs. They show there as snapshots: interactive
 3D views (rotate, zoom) embedded in the page, which need an internet connection to load

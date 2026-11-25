@@ -128,6 +128,7 @@ nbsphinx_thumbnails = {
     'examples/pyvis_test': '_static/pyvis.png',
     'examples/sphere': '_static/sphere.png',
     'examples/hydroshoot_tutorial/hydroshoot_grapevine': '_static/hydroshoot.png',
+    'examples/encoding3d_scenes': '_static/encoding3d.png',
 }
 nbsphinx_allow_errors = True
 
